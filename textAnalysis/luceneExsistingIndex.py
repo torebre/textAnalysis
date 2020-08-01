@@ -18,6 +18,10 @@ from org.apache.lucene.search import IndexSearcher
 # reader = DirectoryReader.open(FSDirectory.open("/media/student/"))
 
 lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+
+# test = "This is how we do it."
+# tokenizer = StandardTokenizer()
+
 #base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 directory = SimpleFSDirectory(Paths.get("/media/project_data/index_test2"))
 searcher = IndexSearcher(DirectoryReader.open(directory))

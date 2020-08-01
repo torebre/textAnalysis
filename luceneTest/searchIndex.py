@@ -12,8 +12,7 @@ from org.apache.lucene.search import IndexSearcher
 
 def searchIndex:
     lucene.initVM(vmargs=['-Djava.awt.headless=true'])
-    print
-    'lucene', lucene.VERSION
+    print('lucene', lucene.VERSION)
     base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
     directory = SimpleFSDirectory(Paths.get(os.path.join(base_dir, INDEX_DIR)))
     searcher = IndexSearcher(DirectoryReader.open(directory))

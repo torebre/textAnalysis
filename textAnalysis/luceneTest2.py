@@ -27,8 +27,9 @@ tokens = []
 
 while stream.incrementToken():
     tokens.append(stream.getAttribute(CharTermAttribute.class_).toString())
-    print(tokens) # JapaneseAnalyzer example.
+    print(tokens)
 
+# JapaneseAnalyzer example.
 analyzer = JapaneseAnalyzer()
 test = "寿司が食べたい。"
 stream = analyzer.tokenStream("", StringReader(test))
