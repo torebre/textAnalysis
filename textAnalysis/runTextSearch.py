@@ -1,17 +1,15 @@
 import lucene
-import configparser
 from textAnalysis.TextSearcher import TextSearcher
 import datetime
 import pandas as pd
 import plotly.offline as py
 import plotly.graph_objs as go
 import plotly.express as px
+import textAnalysis.utilities as util
 
 env = lucene.initVM(vmargs=['-Djava.awt.headless=true'])
 
-config = configparser.RawConfigParser()
-config.read('../app.properties')
-paths_dict = dict(config.items('PATHS'))
+paths_dict = util.getPaths()
 textSearcher = TextSearcher(paths_dict['fs_directory'])
 
 hits = textSearcher.find_documents("Test")

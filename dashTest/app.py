@@ -12,13 +12,15 @@ import pandas as pd
 from dash.dependencies import Input, Output, State
 from textAnalysis.TextSearcher import TextSearcher
 import datetime
+import textAnalysis.utilities as util
 
 DATE_FORMAT = '%m%d%y'
 
 env = lucene.initVM(vmargs=['-Djava.awt.headless=true'])
 # env.attachCurrentThread()
 
-textSearcher = TextSearcher()
+paths_dict = util.getPaths()
+textSearcher = TextSearcher(paths_dict['fs_directory'])
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -49,33 +51,40 @@ app.layout = html.Div(children=[
     html.Div(id="test_output"),
 
     dcc.Graph(
-        id='example-graph',
-        figure=fig
+        id='occurrence-scatterplot'
     )
 ])
 
 @app.callback(
-    Output(component_id="test_output", component_property="children"),
+    Output(component_id="occurrence-scatterplot", component_property="figure"),
     [Input(component_id="search", component_property='n_clicks')],
     [State(component_id='search_text', component_property='value')]
 )
 def do_search(n_clicks, search_text):
-    # TODO Where is the best place to call this?
-    env.attachCurrentThread()
+    if search_text is None:
+        data_frame = pd.DataFrame([])
+        data_frame['Marker'] = []
+    else:
+        # TODO Where is the best place to call this?
+        env.attachCurrentThread()
 
-    hits = textSearcher.find_documents(search_text)
+        hits = textSearcher.find_documents(search_text)
+        date_list = []
 
-    for hit in hits.scoreDocs:
-        document_number = hit.doc
-        document = textSearcher.get_document(document_number)
-        doc_name = document.getField("doc_name")
+        for hit in hits.scoreDocs:
+            document_number = hit.doc
+            document = textSearcher.get_document(document_number)
+            doc_name = document.getField("doc_name")
+            date = datetime.datetime.strptime(doc_name.stringValue(), '%m%d%y')
+            date_list.append(date)
 
-        date = datetime.datetime.strptime(doc_name.stringValue(), DATE_FORMAT)
-        print("Date: %s" % date)
+        data_frame = pd.DataFrame(date_list)
+        data_frame['Marker'] = ['1'] * len(date_list)
 
-        for field in document.getFields():
-            print("Field: %s. Value: %s" % (field.name(), field.stringValue()))
-    return textSearcher.search(search_text)
+    data_frame.columns = ['Date', 'Marker']
+    scatterplot = px.scatter(data_frame, x="Date", y="Marker", range_x=['2015-01-01', '2017-12-31'])
+
+    return scatterplot
 
 
 if __name__ == '__main__':
