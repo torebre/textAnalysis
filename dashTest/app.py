@@ -25,7 +25,6 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
 df = pd.DataFrame({
@@ -44,19 +43,21 @@ app.layout = html.Div(children=[
     '''),
 
     dcc.Input(id="search_text", placeholder="Enter text",
-                 style={"width": "100%"}),
+              style={"width": "100%"}),
 
     html.Button('Search', id='search', n_clicks=0),
-
     html.Div(id="test_output"),
+    html.Div(id="output_fragments"),
 
     dcc.Graph(
         id='occurrence-scatterplot'
     )
 ])
 
+
 @app.callback(
-    Output(component_id="occurrence-scatterplot", component_property="figure"),
+    [Output(component_id="occurrence-scatterplot", component_property="figure"),
+     Output(component_id="output_fragments", component_property="children")],
     [Input(component_id="search", component_property='n_clicks')],
     [State(component_id='search_text', component_property='value')]
 )
@@ -84,7 +85,7 @@ def do_search(n_clicks, search_text):
     data_frame.columns = ['Date', 'Marker']
     scatterplot = px.scatter(data_frame, x="Date", y="Marker", range_x=['2015-01-01', '2017-12-31'])
 
-    return scatterplot
+    return scatterplot,html.B('Test')
 
 
 if __name__ == '__main__':

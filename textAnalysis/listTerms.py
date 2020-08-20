@@ -1,22 +1,19 @@
 import lucene
-
 from java.nio.file import Paths
-import textAnalysis.utilities as util
+from org.apache.lucene.analysis.standard import StandardAnalyzer
 from org.apache.lucene.index import DirectoryReader
-from org.apache.lucene.search.spell import LuceneDictionary
-from org.apache.lucene.store import FSDirectory
-from org.apache.lucene.util import BytesRef, BytesRefIterator
+from org.apache.lucene.queryparser.classic import QueryParser
 from org.apache.lucene.search import IndexSearcher
-from org.apache.lucene.analysis.standard import StandardAnalyzer, StandardTokenizer
-from org.apache.lucene.search.highlight import Highlighter
-from org.apache.lucene.search.highlight import Formatter
-from org.apache.lucene.search.highlight import Fragmenter
 from org.apache.lucene.search.highlight import Highlighter
 from org.apache.lucene.search.highlight import QueryScorer
 from org.apache.lucene.search.highlight import SimpleHTMLFormatter
-from org.apache.lucene.queryparser.classic import QueryParser
 from org.apache.lucene.search.highlight import SimpleSpanFragmenter
 from org.apache.lucene.search.highlight import TokenSources
+from org.apache.lucene.search.spell import LuceneDictionary
+from org.apache.lucene.store import FSDirectory
+from org.apache.lucene.util import BytesRefIterator
+
+import textAnalysis.utilities as util
 
 lucene.initVM(vmargs=['-Djava.awt.headless=true'])
 
@@ -50,12 +47,3 @@ for term in BytesRefIterator.cast_(iterator):
 
         for fragment in best_fragments:
             print('fragment: ', fragment)
-
-    counter += 1
-    if counter > 2:
-        break
-
-# for document_number in range(index_reader.numDocs()):
-#     document = index_reader.document(document_number)
-#     for field in document.getFields():
-#         print('field: ', field)
