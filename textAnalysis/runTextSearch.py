@@ -1,11 +1,11 @@
-import lucene
-from textAnalysis.TextSearcher import TextSearcher
 import datetime
+
+import lucene
 import pandas as pd
-import plotly.offline as py
-import plotly.graph_objs as go
 import plotly.express as px
+
 import textAnalysis.utilities as util
+from textAnalysis.TextSearcher import TextSearcher
 
 env = lucene.initVM(vmargs=['-Djava.awt.headless=true'])
 

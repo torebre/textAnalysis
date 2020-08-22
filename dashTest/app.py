@@ -13,6 +13,7 @@ from dash.dependencies import Input, Output, State
 from textAnalysis.TextSearcher import TextSearcher
 import datetime
 import textAnalysis.utilities as util
+import html2markdown
 
 DATE_FORMAT = '%m%d%y'
 
@@ -62,8 +63,11 @@ app.layout = html.Div(children=[
     [State(component_id='search_text', component_property='value')]
 )
 def do_search(n_clicks, search_text):
+    fragment_list = []
+
     if search_text is None:
         data_frame = pd.DataFrame([])
+        data_frame['Date'] = []
         data_frame['Marker'] = []
     else:
         # TODO Where is the best place to call this?
@@ -82,10 +86,18 @@ def do_search(n_clicks, search_text):
         data_frame = pd.DataFrame(date_list)
         data_frame['Marker'] = ['1'] * len(date_list)
 
+        highlighted_hits = textSearcher.get_highlighted_hits()
+
+        for highlighted_hit in highlighted_hits:
+            for hit in highlighted_hit[1]:
+                fragment_list.append(html.Li(dcc.Markdown(html2markdown.convert(hit))))
+
     data_frame.columns = ['Date', 'Marker']
     scatterplot = px.scatter(data_frame, x="Date", y="Marker", range_x=['2015-01-01', '2017-12-31'])
 
-    return scatterplot,html.B('Test')
+    print(fragment_list)
+
+    return scatterplot, html.Ul(fragment_list)
 
 
 if __name__ == '__main__':
