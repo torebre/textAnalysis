@@ -13,8 +13,8 @@ from org.apache.lucene.store import FSDirectory
 from org.apache.lucene.util import BytesRefIterator
 from org.apache.lucene.search import TopScoreDocCollector
 import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
-
 import datetime
 
 import textAnalysis.utilities as util
@@ -34,20 +34,22 @@ class CreateOccurrenceData:
         self.searcher = IndexSearcher(index_reader)
         self.formatter = SimpleHTMLFormatter()
 
-# counter = 0
-
-# date_document_map = {}
-
-    def populate_frame(self):
+    def populate_frame(self, date_range, term_vector):
+        data_frame = pd.DataFrame(data=0, index=date_range, columns=term_vector)
         iterator = self.lucene_dictionary.getEntryIterator()
 
         for term in BytesRefIterator.cast_(iterator):
             term_as_string = term.utf8ToString()
-            print('term:', term_as_string)
+            # print('term:', term_as_string)
             query = QueryParser("contents", self.analyzer).parse(term_as_string)
             collector = TopScoreDocCollector.create(10000, 10000)
-            hits = self.searcher.search(query, collector)
-            scorer = QueryScorer(query)
+            hits = self.searcher.search(query, 1000)
+
+            if hits is None:
+                # print("No hit for term: ", term_as_string)
+                continue
+
+            print("Found hit: " +term_as_string)
 
             for hit in hits.scoreDocs:
                 document = self.searcher.doc(hit.doc)
@@ -55,16 +57,10 @@ class CreateOccurrenceData:
                 doc_name = document.getField("doc_name")
                 date = datetime.datetime.strptime(doc_name.stringValue(), '%m%d%y')
 
-                # if term_as_string in date_document_map:
-                #     date_document_map[term_as_string].append()
+                current_value = data_frame.at[date, term_as_string]
+                data_frame.at[date, term_as_string] = current_value + 1
 
-                # date_document_map[term_as_string]
-
-                stream = TokenSources.getAnyTokenStream(self.index_reader, hit.doc, 'contents', self.analyzer)
-                # best_fragments = highlighter.getBestFragments(stream, document.get('contents'), 10)
-
-                # for fragment in best_fragments:
-                #     print('fragment: ', fragment)
+        return data_frame
 
     def get_terms(self):
         iterator = self.lucene_dictionary.getEntryIterator()
@@ -73,14 +69,6 @@ class CreateOccurrenceData:
 
         return list(map_iterator)
 
-        # for term in BytesRefIterator.cast_(iterator):
-        #     term_as_string = term.utf8ToString()
-        #     print('term:', term_as_string)
-        #     query = QueryParser("contents", self.analyzer).parse(term_as_string)
-        #     collector = TopScoreDocCollector.create(10000, 10000)
-        #     hits = self.searcher.search(query, collector)
-        #     scorer = QueryScorer(query)
-
 
 temp = CreateOccurrenceData()
 terms = temp.get_terms()
@@ -88,6 +76,11 @@ print("Terms: ", terms)
 
 dates = pd.date_range('1/1/2015', '1/1/2020')
 
-data_frame = pd.DataFrame(index=dates, columns=terms)
+# data_frame = pd.DataFrame(index=dates, columns=terms)
 
-print("Data frame: ", data_frame)
+# print("Data frame: ", data_frame)
+
+data = temp.populate_frame(dates, terms)
+
+data.plot(y='test')
+plt.show()
