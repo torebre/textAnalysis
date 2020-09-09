@@ -16,6 +16,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
+from typing import List
 
 import textAnalysis.utilities as util
 
@@ -35,7 +36,7 @@ class CreateOccurrenceData:
         self.formatter = SimpleHTMLFormatter()
 
     def populate_frame(self, date_range, term_vector):
-        data_frame = pd.DataFrame(data=0, index=date_range, columns=term_vector)
+        data_frame = pd.DataFrame(index=date_range, columns=term_vector)
         iterator = self.lucene_dictionary.getEntryIterator()
 
         for term in BytesRefIterator.cast_(iterator):
@@ -58,11 +59,13 @@ class CreateOccurrenceData:
                 date = datetime.datetime.strptime(doc_name.stringValue(), '%m%d%y')
 
                 current_value = data_frame.at[date, term_as_string]
+                if np.isnan(current_value):
+                    current_value = 0
                 data_frame.at[date, term_as_string] = current_value + 1
 
         return data_frame
 
-    def get_terms(self):
+    def get_terms(self) -> List[str]:
         iterator = self.lucene_dictionary.getEntryIterator()
 
         map_iterator = map(lambda term: term.utf8ToString(), BytesRefIterator.cast_(iterator))
@@ -82,5 +85,8 @@ dates = pd.date_range('1/1/2015', '1/1/2020')
 
 data = temp.populate_frame(dates, terms)
 
-data.plot(y='test')
+data.plot(y='test', style='.')
 plt.show()
+
+# Which rows have a value greater than 0 in the test column
+data.loc[data['test'] > 0]
