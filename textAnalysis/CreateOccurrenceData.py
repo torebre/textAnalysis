@@ -36,7 +36,7 @@ class CreateOccurrenceData:
         self.formatter = SimpleHTMLFormatter()
 
     def populate_frame(self, date_range, term_vector):
-        data_frame = pd.DataFrame(index=date_range, columns=term_vector)
+        data_frame = pd.DataFrame(data=0, index=date_range, columns=term_vector)
         iterator = self.lucene_dictionary.getEntryIterator()
 
         for term in BytesRefIterator.cast_(iterator):
@@ -50,7 +50,7 @@ class CreateOccurrenceData:
                 # print("No hit for term: ", term_as_string)
                 continue
 
-            print("Found hit: " +term_as_string)
+            print("Found hit: " + term_as_string)
 
             for hit in hits.scoreDocs:
                 document = self.searcher.doc(hit.doc)
@@ -71,22 +71,3 @@ class CreateOccurrenceData:
         map_iterator = map(lambda term: term.utf8ToString(), BytesRefIterator.cast_(iterator))
 
         return list(map_iterator)
-
-
-temp = CreateOccurrenceData()
-terms = temp.get_terms()
-print("Terms: ", terms)
-
-dates = pd.date_range('1/1/2015', '1/1/2020')
-
-# data_frame = pd.DataFrame(index=dates, columns=terms)
-
-# print("Data frame: ", data_frame)
-
-data = temp.populate_frame(dates, terms)
-
-data.plot(y='test', style='.')
-plt.show()
-
-# Which rows have a value greater than 0 in the test column
-data.loc[data['test'] > 0]
