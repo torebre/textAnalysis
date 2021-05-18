@@ -35,7 +35,7 @@ class CreateOccurrenceData:
         self.searcher = IndexSearcher(index_reader)
         self.formatter = SimpleHTMLFormatter()
 
-    def populate_frame(self, date_range, term_vector):
+    def populate_frame(self, date_range, term_vector) -> pd.DataFrame:
         data_frame = pd.DataFrame(data=0, index=date_range, columns=term_vector)
         iterator = self.lucene_dictionary.getEntryIterator()
 
