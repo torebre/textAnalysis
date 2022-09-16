@@ -36,7 +36,7 @@ louis==3.5.0
 lucene==8.8.1
 lxml==4.2.1
 macaroonbakery==1.1.3
-Mako==1.0.7
+Mako==1.2.2
 MarkupSafe==1.0
 matplotlib==3.3.4
 mygpoclient==1.8
