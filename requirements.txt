@@ -49,7 +49,7 @@ onboard==1.4.1
 padme==1.1.1
 pandas==1.1.5
 pexpect==4.2.1
-Pillow==8.2.0
+Pillow==9.3.0
 plainbox==0.25
 podcastparser==0.6.2
 protobuf==3.0.0
